@@ -97,6 +97,10 @@ a {
     .seccion-ejercicios {
         grid-column: 1 / 3;
     }
+    .timeline-item {
+    border-left: 2px solid var(--borde-tarjeta);
+    padding: 0 0 18px 18px;
+}
 }
 
 .sidebar,
@@ -132,6 +136,7 @@ a {
     gap: 8px 24px;
     font-size: 0.95rem;
     color: var(--texto-suave);
+    transition: all 0.3s ease;
 }
 
 .header-contact a {
@@ -150,6 +155,12 @@ a {
     color: var(--color-titulo);
     border-bottom: 2px solid var(--color-titulo);
     padding-bottom: 6px;
+    transition: all 0.3s ease;
+}
+
+.card h2:hover {
+    transform: scale(1.01);
+    opacity: 0.85;
 }
 
 .card h3 {
@@ -170,10 +181,10 @@ a {
 }
 
 /*  EXPERIENCIA Y FORMACIÓN  */
-.timeline-item {
+/* .timeline-item {
     border-left: 2px solid var(--borde-tarjeta);
     padding: 0 0 18px 18px;
-}
+} */
 
 .timeline-item h3 {
     margin-top: 0;
@@ -194,19 +205,18 @@ a {
     border-radius: 6px;
     font-size: 0.8rem;
     font-weight: bold;
+    transition: all 0.2s ease;
 }
 
 .tag:hover {
     background: var(--color-titulo);
     color: var(--texto-boton);
+    transform: scale(1.05);
 }
 
 /*  EJERCICIOS  */
 .seccion-ejercicios {
-    background: var(--fondo-cristal);
-    border: 1px solid var(--borde-cristal);
     border-radius: 12px;
-    padding: 24px;
 }
 
 .grid-ejercicios {
@@ -221,8 +231,10 @@ a {
     border-radius: 8px;
     padding: 18px;
     display: flex;
+    flex-wrap: wrap;
     flex-direction: column;
     align-items: flex-start;
+    transition: all 0.2s ease;
 }
 
 .ejercicio-item h3 {
@@ -237,6 +249,7 @@ a {
 
 .ejercicio-item:hover {
     border-color: var(--color-titulo);
+    transform: scale(1.03);
 }
 
 /*  BOTONES  */
@@ -251,6 +264,7 @@ a {
     font-weight: bold;
     text-decoration: none;
     cursor: pointer;
+    transition: all 0.5s ease;
 }
 
 .btn:hover {
