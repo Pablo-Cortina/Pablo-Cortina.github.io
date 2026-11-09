@@ -918,6 +918,199 @@
             Web hecha por Pablo Cortina
         </footer>
     </div>
+<div id="modal" class="modal oculto">
+    <div class="modal-contenido">
+        <button id="cerrar" class="cerrar">×</button>
+        <h2 id="modal-fecha"></h2>
+        <ul id="modal-lista"></ul>
+        <input type="text" id="evento-titulo" placeholder="Título del evento">
+        <textarea id="evento-descripcion" placeholder="Descripción (opcional)"></textarea>
+        <button id="guardar">Añadir evento</button>
+    </div>
+</div>
+<script>
+const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+let eventos = {};
+let claveActual = "";
+const listaDias = [];
+
+const guardado = localStorage.getItem("calendarioEventos");
+if (guardado) {
+    eventos = JSON.parse(guardado);
+}
+
+function guardarEventos() {
+    localStorage.setItem("calendarioEventos", JSON.stringify(eventos));
+}
+
+const modal = document.getElementById("modal");
+const modalFecha = document.getElementById("modal-fecha");
+const modalLista = document.getElementById("modal-lista");
+const inputTitulo = document.getElementById("evento-titulo");
+const inputDescripcion = document.getElementById("evento-descripcion");
+const botonGuardar = document.getElementById("guardar");
+const botonCerrar = document.getElementById("cerrar");
+
+const tooltip = document.createElement("div");
+tooltip.className = "tooltip-evento oculto";
+document.body.appendChild(tooltip);
+
+function pintarMarcas() {
+    listaDias.forEach(function (dia) {
+        const lista = eventos[dia.clave];
+        if (lista && lista.length > 0) {
+            dia.celda.classList.add("con-evento");
+        } else {
+            dia.celda.classList.remove("con-evento");
+        }
+    });
+}
+
+function mostrarTooltip(clave, celda) {
+    const lista = eventos[clave];
+    if (!lista || lista.length === 0) {
+        return;
+    }
+
+    let texto = "";
+    lista.forEach(function (evento) {
+        texto += evento.titulo;
+        if (evento.descripcion !== "") {
+            texto += ": " + evento.descripcion;
+        }
+        texto += "\n";
+    });
+    tooltip.textContent = texto.trim();
+    tooltip.classList.remove("oculto");
+
+    const caja = celda.getBoundingClientRect();
+    const cabecera = document.querySelector("header").getBoundingClientRect();
+
+    let arriba = caja.top - tooltip.offsetHeight - 10;
+    if (arriba < cabecera.bottom) {
+        arriba = caja.bottom + 10;
+    }
+    let izquierda = caja.left + caja.width / 2 - tooltip.offsetWidth / 2;
+    if (izquierda < 8) {
+        izquierda = 8;
+    }
+
+    tooltip.style.top = arriba + "px";
+    tooltip.style.left = izquierda + "px";
+}
+
+function ocultarTooltip() {
+    tooltip.classList.add("oculto");
+}
+
+function pintarLista() {
+    modalLista.innerHTML = "";
+    const lista = eventos[claveActual];
+
+    if (!lista || lista.length === 0) {
+        const vacio = document.createElement("li");
+        vacio.textContent = "No hay eventos este día";
+        modalLista.appendChild(vacio);
+        return;
+    }
+
+    lista.forEach(function (evento, posicion) {
+        const li = document.createElement("li");
+        li.textContent = evento.titulo;
+        if (evento.descripcion !== "") {
+            li.textContent += ": " + evento.descripcion;
+        }
+
+        const botonBorrar = document.createElement("button");
+        botonBorrar.textContent = "Borrar";
+        botonBorrar.className = "borrar";
+        botonBorrar.onclick = function () {
+            borrarEvento(posicion);
+        };
+
+        li.appendChild(botonBorrar);
+        modalLista.appendChild(li);
+    });
+}
+
+function abrirModal(clave) {
+    ocultarTooltip();
+    claveActual = clave;
+
+    const partes = clave.split("-");
+    modalFecha.textContent = partes[1] + " de " + meses[partes[0] - 1] + " de 2026";
+
+    pintarLista();
+    modal.classList.remove("oculto");
+    inputTitulo.focus();
+}
+
+function cerrarModal() {
+    modal.classList.add("oculto");
+    inputTitulo.value = "";
+    inputDescripcion.value = "";
+}
+
+function guardarEvento() {
+    const titulo = inputTitulo.value.trim();
+    const descripcion = inputDescripcion.value.trim();
+
+    if (titulo === "") {
+        alert("Escribe un título para el evento");
+        return;
+    }
+
+    if (!eventos[claveActual]) {
+        eventos[claveActual] = [];
+    }
+    eventos[claveActual].push({ titulo: titulo, descripcion: descripcion });
+
+    guardarEventos();
+    inputTitulo.value = "";
+    inputDescripcion.value = "";
+    pintarLista();
+    pintarMarcas();
+}
+
+function borrarEvento(posicion) {
+    eventos[claveActual].splice(posicion, 1);
+    guardarEventos();
+    pintarLista();
+    pintarMarcas();
+}
+
+const articulos = document.querySelectorAll("article");
+
+for (let i = 0; i < articulos.length; i++) {
+    const celdas = articulos[i].querySelectorAll("td");
+
+    celdas.forEach(function (celda) {
+        const dia = celda.textContent.trim();
+        if (dia === "") {
+            return;
+        }
+
+        const clave = (i + 1) + "-" + dia;
+
+        celda.onclick = function () {
+            abrirModal(clave);
+        };
+        celda.onmouseenter = function () {
+            mostrarTooltip(clave, celda);
+        };
+        celda.onmouseleave = ocultarTooltip;
+
+        celda.classList.add("dia");
+        listaDias.push({ celda: celda, clave: clave });
+    });
+}
+
+botonGuardar.onclick = guardarEvento;
+botonCerrar.onclick = cerrarModal;
+pintarMarcas();
+</script>
 
 </body>
 
